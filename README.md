@@ -13,7 +13,6 @@ Are the bike share programs in Chicago and LA being hit by the pandemic differen
 - CH: 13 columns, by month/quarter, 11m rows
 
 #### TODO
-- hypothesis testing
 - match up graphs for city comparisons
 - when done with notebooks: convert to .py (necessary? but good probably)
   - still use jupyter to move through exploration, but use .py methods
