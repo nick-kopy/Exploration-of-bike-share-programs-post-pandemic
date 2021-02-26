@@ -92,7 +92,7 @@ def la_month_graph(spark_session, ax, hline=True):
 
   ax.set_xlabel('month', fontsize=18)
   ax.set_ylabel('rides taken (thousands)', fontsize=18)
-  ax.set_title("LA's bikeshare rides per month", fontsize=22)
+  ax.set_title("LA's Bike Share Rides per Month", fontsize=22)
 
   ax.legend()
 
@@ -176,6 +176,118 @@ def ch_csv_to_sdf(spark_session):
   # return the complete spark DF
   return ch_sdf_set1.union(ch_sdf_set2).union(ch_sdf_set3)
 
+def la_hour_graph(spark_session, ax):
+  '''
+  Makes a graph of hourly bike rides for 2018-2020.
+
+  Recommended axis input:
+  fig, ax = plt.subplots(figsize=(12,8))
+  '''
+
+  # First grabs the data
+  la_sdf = la_csv_to_sdf(spark_session)
+
+  # Filters out columns we don't need
+  use_cols = ['duration', 'start_time']
+  drop_cols = la_sdf.columns
+  for col in use_cols:
+    drop_cols.remove(col)
+
+  # Moves data to pandas, cast start_time to datetime format
+  la_hr_df = la_sdf.drop(*drop_cols).toPandas()
+
+  la_hr_df['start_time'] = pd.to_datetime(la_hr_df['start_time'], infer_datetime_format=True)
+
+  # Group by hour and include ride counts
+  la_hr_18 = la_hr_df[(la_hr_df['start_time'].dt.year == 2018)].groupby(la_hr_df['start_time'].dt.hour).size()/1000
+
+  la_hr_19 = la_hr_df[(la_hr_df['start_time'].dt.year == 2019)].groupby(la_hr_df['start_time'].dt.hour).size()/1000
+
+  la_hr_20 = la_hr_df[(la_hr_df['start_time'].dt.year == 2020)].groupby(la_hr_df['start_time'].dt.hour).size()/1000
+
+  x = [x for x in range(24)]
+
+  ax.plot(x, la_hr_18, label='2018', linewidth=3)
+  ax.plot(x, la_hr_19, label='2019', linewidth=3)
+  ax.plot(x, la_hr_20, label='2020', linewidth=3)
+
+  ax.set_xticks(x)
+
+  ax.set_xlabel('time (24 hours)', fontsize=18)
+  ax.set_ylabel('rides taken (thousands)', fontsize=18)
+  ax.set_title("LA's Bike Share Rides per Hour", fontsize=22)
+
+  ax.legend()
+
+def ch_wd_graph(spark_session, fig, ax1, ax2):
+  '''
+  Graphs ride count for different weekdays.
+
+  Splits rides up into members and non-members. Compares 2019 to 2020.
+
+  Recommended axis input:
+  fig, (ax1, ax2) = plt.subplots(2, figsize=(18,8))
+  '''
+
+  # First grabs the data
+  ch_sdf = ch_csv_to_sdf(spark_session)
+
+  # Pull out a few columns we'll need
+  ch_sdf_wd = (ch_sdf.withColumn('date', ch_sdf.start_time.cast(DateType()))
+              .withColumn('year', f.date_format('date', 'y'))
+              .withColumn('weekday', f.date_format('date', 'E')))
+
+  # Get trip counts per weekday per year, both member and non-member
+  ch_sdf_wd18 = ch_sdf_wd.filter(ch_sdf_wd.year == 2018).groupBy('weekday').count().withColumnRenamed('count', '2018_ct')
+  ch_sdf_wd18_m = ch_sdf_wd.filter(ch_sdf_wd.year == 2018).filter(ch_sdf_wd.usertype == 1).groupBy('weekday').count().withColumnRenamed('count', '2018_member_ct')
+
+  ch_sdf_wd19 = ch_sdf_wd.filter(ch_sdf_wd.year == 2019).groupBy('weekday').count().withColumnRenamed('count', '2019_ct')
+  ch_sdf_wd19_m = ch_sdf_wd.filter(ch_sdf_wd.year == 2019).filter(ch_sdf_wd.usertype == 1).groupBy('weekday').count().withColumnRenamed('count', '2019_member_ct')
+
+  ch_sdf_wd20 = ch_sdf_wd.filter(ch_sdf_wd.year == 2020).groupBy('weekday').count().withColumnRenamed('count', '2020_ct')
+  ch_sdf_wd20_m = ch_sdf_wd.filter(ch_sdf_wd.year == 2020).filter(ch_sdf_wd.usertype == 1).groupBy('weekday').count().withColumnRenamed('count', '2020_member_ct')
+
+  # Put aggregates together and port to Pandas (this is the slowest part)
+  ch_df_wd = (ch_sdf_wd18.join(ch_sdf_wd18_m, ['weekday'])
+              .join(ch_sdf_wd19, ['weekday'])
+              .join(ch_sdf_wd19_m, ['weekday'])
+              .join(ch_sdf_wd20, ['weekday'])
+              .join(ch_sdf_wd20_m, ['weekday'])
+              .toPandas())
+
+  # Sort by weekday
+  wd_sort = dict(zip(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], range(7)))
+  ch_df_wd['weekday'] = ch_df_wd['weekday'].map(wd_sort)
+  ch_df_wd.sort_values(by=['weekday'], inplace=True)
+
+  # Plot 2019
+  width = 0.3
+  ax1.bar(ch_df_wd['weekday']-width/2, ch_df_wd['2019_member_ct']/1000, width=width, align='center', label='member', color=(0.2, 0.4, 0.6, 1))
+  ax1.bar(ch_df_wd['weekday']+width/2, (ch_df_wd['2019_ct']-ch_df_wd['2019_member_ct'])/1000, width=width, align='center', label='non-member', color=(0.25, 0.6, 0.35, 1))
+  ax1.set_ylim(0, 520)
+
+  ax1.set_xticks(ch_df_wd['weekday'])
+  ax1.set_xticklabels(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+
+  ax1.set_xlabel('2019', fontsize=18)
+  ax1.set_ylabel('rides taken\n(thousands)', fontsize=18)
+
+  ax1.legend()
+
+  # Plot 2020
+  ax2.bar(ch_df_wd['weekday']-width/2, ch_df_wd['2020_member_ct']/1000, width=width, align='center', label='member', color=(0.2, 0.4, 0.6, 1))
+  ax2.bar(ch_df_wd['weekday']+width/2, (ch_df_wd['2020_ct']-ch_df_wd['2020_member_ct'])/1000, width=width, align='center', label='non-member', color=(0.25, 0.6, 0.35, 1))
+  ax2.set_ylim(0, 520)
+
+  ax2.set_xticks(ch_df_wd['weekday'])
+  ax2.set_xticklabels(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+
+  ax2.set_xlabel('2020', fontsize=18)
+
+  ax2.legend()
+
+  fig.suptitle('Chicago Bike Share Rides per Weekday - 2019 vs 2020', fontsize=22)
+
 def ch_month_graph(spark_session, ax, hline=True):
   '''
   Makes a graph of monthly bike rides from 2018-2020.
@@ -228,7 +340,7 @@ def ch_month_graph(spark_session, ax, hline=True):
 
   ax.set_xlabel('month', fontsize=18)
   ax.set_ylabel('rides taken (thousands)', fontsize=18)
-  ax.set_title("Chicago's bikeshare rides per month", fontsize=22)
+  ax.set_title("Chicago's Bike Share Rides per Month", fontsize=22)
 
   ax.legend()
 
@@ -337,7 +449,7 @@ def la_diff_graph(spark_session, fig, ax1, ax2):
 
   fig.suptitle("Daily Difference Scores for LA's Bike Share", fontsize=22)
 
-def ch_diff_graph(spark_session, fig, ax1, ax2):
+def ch_q_graph(spark_session, ax):
   '''
   Graphs difference scores showing 2019 growth and 2020 growth.
 
@@ -345,7 +457,7 @@ def ch_diff_graph(spark_session, fig, ax1, ax2):
   while blue line is a LOWESS trend line.
 
   Recommended axis input:
-  fig, (ax1, ax2) = plt.subplots(2, figsize=(18,8))
+  fig, ax = plt.subplots(figsize=(12,4))
   '''
 
   # Grab our daily ride counts
@@ -356,34 +468,84 @@ def ch_diff_graph(spark_session, fig, ax1, ax2):
 
   # Calculate difference scores
   ch_1920_diff = ch_df_dy[ch_df_dy['date'].dt.year == 2020].reset_index()['ride_ct'] - ch_df_dy[ch_df_dy['date'].dt.year == 2019].reset_index()['ride_ct']
-  ch_1819_diff = ch_df_dy[ch_df_dy['date'].dt.year == 2019].reset_index()['ride_ct'] - ch_df_dy[ch_df_dy['date'].dt.year == 2018].reset_index()['ride_ct']
 
   # Make an x axis and trend lines
   x = [x for x in range(1, 366)]
-  low19 = lowess(ch_1819_diff, x)[:,1]
   low20 = lowess(ch_1920_diff, x)[:,1]
 
-  # '18 '19 plot
-  ax1.scatter(x, ch_1819_diff)
-  ax1.plot(low19, linewidth=3, color='b')
+  # plot the data
+  ax.scatter(x, ch_1920_diff)
+  ax.plot(low20, linewidth=3, color='b')
 
-  ax1.set_xticks([m for m in range(1,360,30)])
-  ax1.set_xticklabels(['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'])
-  ax1.set_ylim(-15000, 15000)
+  # Denote quarters
+  ax.axvspan(1, 90, color=(1,0.1,0.1,0.2))
+  ax.axvspan(91, 181, color=(0.6, 0.4, 0.6, 0.2))
+  ax.axvspan(182, 272, color=(0.2, 0.4, 0.6, 0.2))
+  ax.axvspan(273, 365, color=(0,0,0,0.2))
 
-  ax1.set_ylabel('Difference score\n(ride count)', fontsize=18)
-  ax1.set_title("2019 growth", fontsize=18)
+  ax.text(5, 14000, 'Q1', fontsize=12)
+  ax.text(96, 14000, 'Q2', fontsize=12)
+  ax.text(187, 14000, 'Q3', fontsize=12)
+  ax.text(278, 14000, 'Q4', fontsize=12)
 
-  # '19 '20 plot
-  ax2.scatter(x, ch_1920_diff)
-  ax2.plot(low20, linewidth=3, color='b')
+  # Add peripherals
+  ax.set_xticks([m for m in range(1,360,30)])
+  ax.set_xticklabels(['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'])
 
-  ax2.set_xticks([m for m in range(1,360,30)])
-  ax2.set_xticklabels(['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'])
-  ax2.set_ylim(-15000, 15000)
+  ax.set_xlabel('month', fontsize=18)
+  ax.set_ylabel('Difference score\n(ride count)', fontsize=18)
+  ax.set_title("Daily Difference Scores for\nChicago's Bike Share (growth from 2019 to 2020)", fontsize=22)
 
-  ax2.set_xlabel('month', fontsize=18)
-  ax2.set_ylabel('Difference score\n(ride count)', fontsize=18)
-  ax2.set_title("2020 growth", fontsize=18)
+def la_q(spark_session):
+  '''
+  Returns four datasets: 90 ride counts from the four quarters of the year.
 
-  fig.suptitle("Daily Difference Scores for Chicago's Bike Share", fontsize=22)
+  Days included are 1-90, 91-180, 182-271, 274-363. This is to force quarters
+  to each have 90 days and start on Jan 1, Apr 1, Jul 1, and Oct 1 respectively.
+  Slices are also zero indexed and exclusive of end term so it takes a second
+  to think it through.
+  '''
+
+  # Grab our daily ride counts
+  la_df_dy = la_diff_scores(spark_session)
+
+  # Remove feb 29th, 2020
+  la_df_dy = la_df_dy[~((la_df_dy['date'].dt.month == 2) & (la_df_dy['date'].dt.day == 29))]
+
+  # Calculate difference scores
+  la_1920_diff = la_df_dy[la_df_dy['date'].dt.year == 2020].reset_index()['ride_ct'] - la_df_dy[la_df_dy['date'].dt.year == 2019].reset_index()['ride_ct']
+
+  la_Q1 = la_1920_diff.iloc[0:90]
+  la_Q2 = la_1920_diff.iloc[90:180]
+  la_Q3 = la_1920_diff.iloc[181:271]
+  la_Q4 = la_1920_diff.iloc[273:363]
+
+  return la_Q1, la_Q2, la_Q3, la_Q4
+
+def ch_q(spark_session):
+  '''
+  Returns four datasets: 90 ride counts from the four quarters of the year.
+
+  Days included are 1-90, 91-180, 182-271, 274-363. This is to force quarters
+  to each have 90 days and start on Jan 1, Apr 1, Jul 1, and Oct 1 respectively.
+  Slices are also zero indexed and exclusive of end term so it takes a second
+  to think it through.
+  '''
+
+  # Grab our daily ride counts
+  ch_df_dy = ch_diff_scores(spark_session)
+
+  # Remove feb 29th, 2020
+  ch_df_dy = ch_df_dy[~((ch_df_dy['date'].dt.month == 2) & (ch_df_dy['date'].dt.day == 29))]
+
+  # Calculate difference scores
+  ch_1920_diff = ch_df_dy[ch_df_dy['date'].dt.year == 2020].reset_index()['ride_ct'] - ch_df_dy[ch_df_dy['date'].dt.year == 2019].reset_index()['ride_ct']
+
+  ch_Q1 = ch_1920_diff.iloc[0:90]
+  ch_Q2 = ch_1920_diff.iloc[90:180]
+  ch_Q3 = ch_1920_diff.iloc[181:271]
+  ch_Q4 = ch_1920_diff.iloc[273:363]
+
+  return ch_Q1, ch_Q2, ch_Q3, ch_Q4
+
+#
