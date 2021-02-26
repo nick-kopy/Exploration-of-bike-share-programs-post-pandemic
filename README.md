@@ -122,7 +122,7 @@ Also, although our test determined ridership changed it doesn't explain why. The
 
 This analysis operates on top of some assumptions which when it comes down to it are not upheld. So even though the math plays out, when interpreting the results it's important to not overextend.
 
-- "Programs are consistent over time." These programs are in most cases growing, and in many cities younger than a decade old. LA specifically moved to upgrade a significant portion of their network while ridership was down (https://bikeshare.metro.net/westside-improvement-project/) which in all likelihood exacerbated the pandemic decline.
+- "Programs are consistent over time." These programs are in most cases growing, and in many cities younger than a decade old. LA specifically moved to [upgrade](https://bikeshare.metro.net/westside-improvement-project/) a significant portion of their network while ridership was down which in all likelihood exacerbated the pandemic decline.
 - "Programs are independent city to city." While LA and Chicago are pretty different, they are not independent. Both are subject to more universal variables like national level bike trends or pressures to reduce carbon emmissions.
 - "LA and Chicago's programs are comparable." The truth is as a whole Chicago's system is much bigger. Chicago has about 4 times as many bikes, 6 times as many stations, and 14 times as many bike rides per year. This is in spite of the fact that LA is the more populous city.
 
