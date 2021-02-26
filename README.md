@@ -80,32 +80,32 @@ Each hypothesis is paired with its own version of the same null hypothesis
 
 We'll compare quarter data with two sample t-tests. What should our threshold of statistical significance be? The classic value is alpha = 0.05, but since we are testing 4 hypotheses let's include a Bonferroni correction. Instead we will use 0.05 / 4 or alpha = 0.0125. In short, as long as any p-value from the t-tests is below 0.0125 on any given test, it is statistically significant.
 
->--LA--
->Q1 mean: 200.56
->Q2 mean: -111.24
->Comparing Q1 and Q2 in LA:
-> p = 6.57e-12
-
->--Chicago--
->Q1 mean: 646.46
->Q2 mean: -5004.43
->Comparing Q1 and Q2 in Chicago:
+>--LA--  
+>Q1 mean: 200.56  
+>Q2 mean: -111.24  
+>Comparing Q1 and Q2 in LA:  
+> p = 6.57e-12  
+>
+>--Chicago--  
+>Q1 mean: 646.46  
+>Q2 mean: -5004.43  
+>Comparing Q1 and Q2 in Chicago:  
 > p = 1.74e-16
 
 When we compare Q1 (pre-pandemic) to Q2 (post-pandemic) for both LA and Chicago they have p values less than our alpha of 0.0125. We fail to reject the null that quarter ride counts are sampled from the same distribution, and have evidence to support them being different. Because quarter means move from positive to negative, the effect is a negative one.
 
 That is to say ride counts went down from the first to second quarter (backed up by math) and it's pretty safe to say the pandemic was the cause. But this isn't surprising, let's move on to see how each city fared a couple months in.
 
->--LA--
->Q2 mean: -111.24
->Q3 mean: -550.9
->Comparing Q2 and Q3 in LA:
-> p =  1.63e-30
-
->--Chicago--
->Q2 mean: -5004.43
->Q3 mean: 669.24
->Comparing Q2 and Q3 in Chicago:
+>--LA--  
+>Q2 mean: -111.24  
+>Q3 mean: -550.9  
+>Comparing Q2 and Q3 in LA:  
+> p =  1.63e-30  
+>
+>--Chicago--  
+>Q2 mean: -5004.43  
+>Q3 mean: 669.24  
+>Comparing Q2 and Q3 in Chicago:  
 > p =  1.25e-12
 
 Once again, our t-test comparisons yield p values lower than our 0.0125 threshold on both accounts. We fail to reject the null that quarter ride counts are sampled from the same distribution, and have evidence to support them being different.
@@ -129,10 +129,7 @@ This analysis operates on top of some assumptions which when it comes down to it
 #### TODO
 - address h testing assumptions
   - end with potential future directions (more cities, correlate w/ other data)
-- "representative shard of data" is in repository
 - in README include that specific steps can be found in exploration.ipynb
-  - maybe end with "we know that they are different but can't say why. Although we couldn't say with this data by itself it sparks an interesting line of investigation" or something
-  - include statistically significant results but specifics can stay in ipynb
   - link to student github (interesting)
 - presentation
   - practice beforehand, see rubric for specifics
