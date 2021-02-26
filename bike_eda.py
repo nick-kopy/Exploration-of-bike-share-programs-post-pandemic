@@ -428,6 +428,8 @@ def la_diff_graph(spark_session, fig, ax1, ax2):
   ax1.scatter(x, la_1819_diff)
   ax1.plot(low19, linewidth=3, color='b')
 
+  ax1.axhline(linewidth=2, color=(0,0,0,0.4))
+
   ax1.set_xticks([m for m in range(1,360,30)])
   ax1.set_xticklabels(['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'])
   ax1.set_ylim(-1000, 1000)
@@ -438,6 +440,8 @@ def la_diff_graph(spark_session, fig, ax1, ax2):
   # '19 '20 plot
   ax2.scatter(x, la_1920_diff)
   ax2.plot(low20, linewidth=3, color='b')
+
+  ax2.axhline(linewidth=2, color=(0,0,0,0.4))
 
   ax2.set_xticks([m for m in range(1,360,30)])
   ax2.set_xticklabels(['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'])
@@ -477,6 +481,9 @@ def ch_q_graph(spark_session, ax):
   ax.scatter(x, ch_1920_diff)
   ax.plot(low20, linewidth=3, color='b')
 
+  # add a zero line to emphasize growth/shrinkage
+  ax.axhline(linewidth=2, color=(0,0,0,0.4))
+
   # Denote quarters
   ax.axvspan(1, 90, color=(1,0.1,0.1,0.2))
   ax.axvspan(91, 181, color=(0.6, 0.4, 0.6, 0.2))
@@ -494,7 +501,7 @@ def ch_q_graph(spark_session, ax):
 
   ax.set_xlabel('month', fontsize=18)
   ax.set_ylabel('Difference score\n(ride count)', fontsize=18)
-  ax.set_title("Daily Difference Scores for\nChicago's Bike Share (growth from 2019 to 2020)", fontsize=22)
+  ax.set_title("Daily Difference Scores for Chicago's Bike Share 2020", fontsize=22)
 
 def la_q(spark_session):
   '''

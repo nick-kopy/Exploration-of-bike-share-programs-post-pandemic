@@ -1,6 +1,8 @@
 ### Project overview
 An exploratory data analysis of public bikeshare data from two major bike share programs, one in LA and one in Chicago, focusing on the effects of the pandemic.
 
+>Check out the five minute [slide version](https://docs.google.com/presentation/d/1RIWjArsmzxX4UJmFa2dPijsHT-K7QFwcGdl3isUzoI0/edit?usp=sharing) of this repo!
+
 #### The story
 So I've got a friend in Chicago who is doing work from home. He's thinking about selling his car, but then in the cases where he does go out he would need to rely on other things. Other things like bikes, maybe even rentable bikes.
 
@@ -18,7 +20,7 @@ The data in this analysis comes from public sources:
 ### Exploratory data analysis
 After downloading the data, cleaning it, checking for missing data, and unifying mismatched formats we are ready to dive in and see what the data says.
 
-> For a more complete look at the code and statistics used, please see exploration.ipynb. If you'd like to run the code yourself, check out [Pyspark](https://spark.apache.org/docs/latest/api/python/)!
+> For a more complete look at the code and statistics used, please see the [exploration](https://github.com/nick-kopy/Exploration-of-bike-share-programs-post-pandemic/blob/main/exploration.ipynb) file. If you'd like to run the code yourself, check out [Pyspark](https://spark.apache.org/docs/latest/api/python/)!
 
 Let's move on to a visualization so we can get a sense of the shape of the data. First we'll do ride count per hour of day across the year for LA.
 
@@ -85,7 +87,7 @@ We'll compare quarter data with two sample t-tests. What should our threshold of
 >Q2 mean: -111.24  
 >Comparing Q1 and Q2 in LA:  
 > p = 6.57e-12  
->
+>  
 >--Chicago--  
 >Q1 mean: 646.46  
 >Q2 mean: -5004.43  
@@ -101,7 +103,7 @@ That is to say ride counts went down from the first to second quarter (backed up
 >Q3 mean: -550.9  
 >Comparing Q2 and Q3 in LA:  
 > p =  1.63e-30  
->
+>  
 >--Chicago--  
 >Q2 mean: -5004.43  
 >Q3 mean: 669.24  
@@ -122,19 +124,7 @@ Also, although our test determined ridership changed it doesn't explain why. The
 
 This analysis operates on top of some assumptions which when it comes down to it are not upheld. So even though the math plays out, when interpreting the results it's important to not overextend.
 
-- "Programs are consistent over time." These programs are in most cases growing, and in many cities younger than a decade old. LA specifically moved to [upgrade](https://bikeshare.metro.net/westside-improvement-project/) a significant portion of their network while ridership was down which in all likelihood exacerbated the pandemic decline.
-- "Programs are independent city to city." While LA and Chicago are pretty different, they are not independent. Both are subject to more universal variables like national level bike trends or pressures to reduce carbon emmissions.
+- "Programs are consistent over time." These programs are in most cases growing, and in many cities younger than a decade old. LA specifically moved to [upgrade](https://bikeshare.metro.net/westside-improvement-project/) a significant portion of their network while ridership was down which in all likelihood exacerbated the pandemic decline. It's not always fair to compare 2019 to 2020 because these programs evolve.
+- "Programs are independent city to city." While LA and Chicago are pretty different, they are not independent. Both are subject to more universal variables like national level bike trends or pressures to reduce carbon emmissions (or a global pandemic).
 - "LA and Chicago's programs are comparable." The truth is as a whole Chicago's system is much bigger. Chicago has about 4 times as many bikes, 6 times as many stations, and 14 times as many bike rides per year. This is in spite of the fact that LA is the more populous city.
-
-#### TODO
-- address h testing assumptions
-  - end with potential future directions (more cities, correlate w/ other data)
-- in README include that specific steps can be found in exploration.ipynb
-  - link to student github (interesting)
-- presentation
-  - practice beforehand, see rubric for specifics
-  - identify data sources, show sufficient data for trends to emerge
-  - show trends, move to project question (h tests)
-  - set  up H tests, give results
-  - interpret results, why this matters
-  - H tests should be lay, but audience is DS so other stuff can be technical
+- "Ride count is independent across time" In order to avoid violating this assumption we changed our unit of measurement from ride counts to difference in ride counts between years. Comparing the simple ride count of January 1st vs July 1st, these are not independent. However comparing the ride count growth from 1-1-2019 to 1-1-2020 vs ride count growth 7-1-2019 to 7-1-2020, the seasons and holidays are mostly ruled out as confounding factors. Using difference scores does not entirely make samples independent, however it should be enough for our statistical tests to be acceptably interpreted.

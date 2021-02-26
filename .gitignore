@@ -1,5 +1,6 @@
 data_clean.ipynb
 data/
+graphs/la_diff2.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
