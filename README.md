@@ -1,5 +1,5 @@
 ### Project overview
-An exploratory data analysis of public bikeshare data from two major bike share programs, one in LA and one in Chicago, focusing on the effects of the pandemic.
+An exploratory data analysis of public bike share data from two major bike share programs, one in LA and one in Chicago, focusing on the effects of the pandemic.
 
 >Check out the five minute [slide version](https://docs.google.com/presentation/d/1RIWjArsmzxX4UJmFa2dPijsHT-K7QFwcGdl3isUzoI0/edit?usp=sharing) of this repo!
 
@@ -44,7 +44,7 @@ Let's look at Chicago during the same time period.
 
 The features of the data are similar to LA's and there is no missing data to note, so we'll jump straight to the visualization.
 
-While Chicago certainly has a dip a couple months into 2020, they appear to recover and even exceed their 2019 numbers by fall. By looking at the scale of rides taken you can also tell Chicago's program is much bigger. Even in the dead of winter more bikes are being riden than in LA's peak season.
+While Chicago certainly has a dip a couple months into 2020, they appear to recover and even exceed their 2019 numbers by fall. By looking at the scale of rides taken you can also tell Chicago's program is much bigger. Even in the dead of winter more bikes are being ridden than in LA's peak season.
 
 ![plot4](graphs/chicago_month.png)
 
@@ -94,7 +94,7 @@ We'll compare quarter data with two sample t-tests. What should our threshold of
 >Comparing Q1 and Q2 in Chicago:  
 > p = 1.74e-16
 
-When we compare Q1 (pre-pandemic) to Q2 (post-pandemic) for both LA and Chicago they have p values less than our alpha of 0.0125. We fail to reject the null that quarter ride counts are sampled from the same distribution, and have evidence to support them being different. Because quarter means move from positive to negative, the effect is a negative one.
+When we compare Q1 (pre-pandemic) to Q2 (post-pandemic) for both LA and Chicago they have p values less than our alpha of 0.0125. We reject the null that quarter ride counts are sampled from the same distribution, and have evidence to support them being different. Because quarter means move from positive to negative, the effect is a negative one.
 
 That is to say ride counts went down from the first to second quarter (backed up by math) and it's pretty safe to say the pandemic was the cause. But this isn't surprising, let's move on to see how each city fared a couple months in.
 
@@ -110,7 +110,7 @@ That is to say ride counts went down from the first to second quarter (backed up
 >Comparing Q2 and Q3 in Chicago:  
 > p =  1.25e-12
 
-Once again, our t-test comparisons yield p values lower than our 0.0125 threshold on both accounts. We fail to reject the null that quarter ride counts are sampled from the same distribution, and have evidence to support them being different.
+Once again, our t-test comparisons yield p values lower than our 0.0125 threshold on both accounts. We reject the null that quarter ride counts are sampled from the same distribution, and have evidence to support them being different.
 
 The difference here is that LA moves from bad to worse. Chicago moves from bad to good again. Chicago recovers while LA does not.
 
@@ -125,6 +125,6 @@ Also, although our test determined ridership changed it doesn't explain why. The
 This analysis operates on top of some assumptions which when it comes down to it are not upheld. So even though the math plays out, when interpreting the results it's important to not overextend.
 
 - "Programs are consistent over time." These programs are in most cases growing, and in many cities younger than a decade old. LA specifically moved to [upgrade](https://bikeshare.metro.net/westside-improvement-project/) a significant portion of their network while ridership was down which in all likelihood exacerbated the pandemic decline. It's not always fair to compare 2019 to 2020 because these programs evolve.
-- "Programs are independent city to city." While LA and Chicago are pretty different, they are not independent. Both are subject to more universal variables like national level bike trends or pressures to reduce carbon emmissions (or a global pandemic).
+- "Programs are independent city to city." While LA and Chicago are pretty different, they are not independent. Both are subject to more universal variables like national level bike trends or pressures to reduce carbon emissions (or a global pandemic).
 - "LA and Chicago's programs are comparable." The truth is as a whole Chicago's system is much bigger. Chicago has about 4 times as many bikes, 6 times as many stations, and 14 times as many bike rides per year. This is in spite of the fact that LA is the more populous city.
 - "Ride count is independent across time" In order to avoid violating this assumption we changed our unit of measurement from ride counts to difference in ride counts between years. Comparing the simple ride count of January 1st vs July 1st, these are not independent. However comparing the ride count growth from 1-1-2019 to 1-1-2020 vs ride count growth 7-1-2019 to 7-1-2020, the seasons and holidays are mostly ruled out as confounding factors. Using difference scores does not entirely make samples independent, however it should be enough for our statistical tests to be acceptably interpreted.
