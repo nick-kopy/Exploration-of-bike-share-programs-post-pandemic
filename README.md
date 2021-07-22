@@ -1,3 +1,5 @@
+# Exploration of Bike Share Programs Post-Pandemic
+
 ### Project overview
 An exploratory data analysis of public bike share data from two major bike share programs, one in LA and one in Chicago, focusing on the effects of the pandemic.
 
